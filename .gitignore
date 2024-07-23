@@ -2,3 +2,5 @@
 .env
 /node_modules
 !/.env
+logs/error.log
+logs/info.log
