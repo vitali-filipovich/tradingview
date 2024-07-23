@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TradingView</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .favorite {
+            background-color: yellow;
+        }
+    </style>
+</head>
+<body>
+<h1>Trading Quotes</h1>
+<table id="quotes">
+    <thead>
+    <tr>
+        <th>Symbol</th>
+        <th>Ask (+ spread of 5%)</th>
+        <th>Bid (+ spread of 5%)</th>
+        <th>Action</th>
+    </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+<h2>Favorites</h2>
+<table id="favorites">
+    <thead>
+    <tr>
+        <th>Symbol</th>
+        <th>Action</th>
+    </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+<script>
+    async function fetchQuotes() {
+        console.log('Fetching quotes');
+        const response = await fetch('/api/quotes');
+        const quotes = await response.json();
+        const quotesTbody = document.querySelector('#quotes tbody');
+
+        quotesTbody.innerHTML = quotes.map(quote => `
+                <tr class="${quote.isFavorite ? 'favorite' : ''}">
+                    <td>${quote.symbol}</td>
+                    <td>${quote.ask.toFixed(3)}</td>
+                    <td>${quote.bid.toFixed(3)}</td>
+                    <td>
+                        ${quote.isFavorite ? `<button onclick="removeFromFavorites('${quote.symbol}')">Remove from Favorites</button>` : `<button onclick="addToFavorites('${quote.symbol}')">Add to Favorites</button>`}
+                    </td>
+                </tr>
+            `).join('');
+    }
+
+    async function fetchFavorites() {
+        console.log('Fetching favorites');
+        const response = await fetch('/api/favorites');
+        const favorites = await response.json();
+        const favoritesTbody = document.querySelector('#favorites tbody');
+
+        favoritesTbody.innerHTML = favorites.map(fav => `
+                <tr>
+                    <td>${fav.symbol}</td>
+                    <td><button onclick="removeFromFavorites('${fav.symbol}')">Remove from Favorites</button></td>
+                </tr>
+            `).join('');
+    }
+
+    async function addToFavorites(symbol) {
+        console.log(`Adding to favorites: ${symbol}`);
+
+        const response = await fetch('/api/favorites', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ symbol })
+        });
+
+        if (response.ok) {
+            fetchQuotes();
+            fetchFavorites();
+        } else {
+            const error = await response.json();
+            alert(`Error: ${error.message}`);
+        }
+    }
+
+    async function removeFromFavorites(symbol) {
+        console.log(`Removing from favorites: ${symbol}`);
+        const response = await fetch(`/api/favorites/${symbol}`, {
+            method: 'DELETE'
+        });
+
+        if (response.ok) {
+            fetchQuotes();
+            fetchFavorites();
+        } else {
+            const error = await response.json();
+            alert(`Error: ${error.message}`);
+        }
+    }
+
+    setInterval(fetchQuotes, 10000);
+
+    fetchQuotes();
+    fetchFavorites();
+</script>
+</body>
+</html>
