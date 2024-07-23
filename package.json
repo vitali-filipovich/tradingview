@@ -1,0 +1,35 @@
+{
+  "name": "tradingview-app",
+  "version": "1.0.0",
+  "description": "A Node.js application for fetching and displaying trading quotes with a 5% spread.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "jest",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "migrate": "node migrations/initialMigration.js"
+  },
+  "engines" : {
+    "node" : ">=12.0.0"
+  },
+  "keywords": [],
+  "author": "Vitali Filipovich",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^1.7.2",
+    "body-parser": "^1.20.2",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "express-validator": "^7.1.0",
+    "mongoose": "^8.5.1",
+    "winston": "^3.13.1"
+  },
+  "devDependencies": {
+    "eslint": "^7.32.0",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-react": "^7.24.0",
+    "jest": "^29.7.0",
+    "supertest": "^7.0.0"
+  }
+}
